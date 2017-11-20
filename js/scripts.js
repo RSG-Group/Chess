@@ -49,7 +49,8 @@ class MainComponent extends React.Component {
 
     this.state = {
       selected: null,
-      promotionParams: null
+      promotionParams: null,
+      welcomeDialog: true
     };
   }
 
@@ -142,9 +143,33 @@ class MainComponent extends React.Component {
             </tr>
           </tbody>
         </table>
-
-        {this.state.promotionParams && this.__renderPromotionDialog()}
+        
+        { this.state.promotionParams && this.__renderPromotionDialog() }
+        { this.__renderWelcomeDialog() }
       </div>
+    );
+  }
+
+  __renderWelcomeDialog () {
+    return (
+      <Modal
+        show={this.state.welcomeDialog}
+        onHide={() => { this.setState({ welcomeDialog: false }) }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Welcome!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Welcome message
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={() => {
+              this.setState({ welcomeDialog: false })
+            }}
+          >Let's start!</Button>
+        </Modal.Footer>
+      </Modal>
     );
   }
 
