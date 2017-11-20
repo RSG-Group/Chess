@@ -50,7 +50,8 @@ class MainComponent extends React.Component {
     this.state = {
       selected: null,
       promotionParams: null,
-      welcomeDialog: true
+      welcomeDialog: true,
+      rotate: false
     };
   }
 
@@ -143,7 +144,7 @@ class MainComponent extends React.Component {
             </tr>
           </tbody>
         </table>
-        
+
         { this.state.promotionParams && this.__renderPromotionDialog() }
         { this.__renderWelcomeDialog() }
       </div>
@@ -157,10 +158,28 @@ class MainComponent extends React.Component {
         onHide={() => { this.setState({ welcomeDialog: false }) }}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Welcome!</Modal.Title>
+          <Modal.Title>Welcome</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Welcome message
+          Welcome to RSG Chess! <br />
+          Cool chess game for everyone. Challenge your friends and have fun!
+          <br /><br />
+          How to play?
+          <ul>
+            <li>
+              Singleplayer - Play with your opponent on YOUR device.
+              <ul>
+                <li>Like real chess board - Place your device horizontally on the surface,
+                <b
+                  style={{cursor: 'pointer'}}
+                  onClick={() => { this.setState({rotate: ture}) }}
+                > click here to rotate the black figures </b> 
+                and feel like playing on real chess board.</li>
+              </ul>
+            </li>
+            <li>Multiplayer - Coming soon...</li>
+            <li>Play VS computer - Coming in the next bigger release.</li>
+          </ul>
         </Modal.Body>
         <Modal.Footer>
           <Button
