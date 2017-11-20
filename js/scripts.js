@@ -51,7 +51,7 @@ class MainComponent extends React.Component {
       selected: null,
       promotionParams: null,
       welcomeDialog: true,
-      rotate: false
+      rotated: false
     };
   }
 
@@ -94,7 +94,7 @@ class MainComponent extends React.Component {
   }
 
   __renderTable () {
-    const { selected } = this.state;
+    const { selected, rotated } = this.state;
     const validMoves = selected && selected.getValidMoves(true);
     return game.board.map((rank, i) => (
       <tr key={i}>
@@ -104,9 +104,10 @@ class MainComponent extends React.Component {
               onClick={this.__handleClick.bind(this, j, i)}
               className={classNames({
                 selected: selected && selected === piece,
-                validMoves: selected && _.find(validMoves, { x: j, y: i })
+                validMoves: selected && _.find(validMoves, { x: j, y: i }),
+                rotated: rotated && piece && piece.color === 'B'
               })}
-              >
+            >
               {piece && piece.char}
             </td>            
           ))
@@ -172,7 +173,7 @@ class MainComponent extends React.Component {
                 <li>Like real chess board - Place your device horizontally on the surface,
                 <b
                   style={{cursor: 'pointer'}}
-                  onClick={() => { this.setState({rotate: ture}) }}
+                  onClick={() => { this.setState({rotated: true}) }}
                 > click here to rotate the black figures </b> 
                 and feel like playing on real chess board.</li>
               </ul>

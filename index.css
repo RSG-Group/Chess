@@ -1,5 +1,5 @@
 #table{
-  background: rgba(247, 203, 76, 0.5);
+  background: rgb(209, 139, 71);
   border: 1px solid black;
   width: 500px;
   height: 500px;
@@ -8,7 +8,11 @@
 }
 
 div#app{
- perspective: 1555px;
+  perspective: 1555px;
+}
+
+.rotated {
+  transform: rotateX(180deg);
 }
 
 div#app > div {
