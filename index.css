@@ -12,9 +12,9 @@ div#app{
 }
 
 div#app > div {
- transition: transform 1s;
+ /* transition: transform 1s;
  transform: rotateX(15deg) rotateY(-15deg) rotateX(3deg);
- transform-origin: 15px 525px 15px;
+ transform-origin: 15px 525px 15px; */
  display: inline-block;
 }
 
@@ -43,7 +43,7 @@ div#app > div:hover{
   border: 1px solid gray;
   width: 12.5%;
   height: 12.5%;
-  font-size: 40px;
+  font-size: 35px;
   text-align: center;
 }
 
