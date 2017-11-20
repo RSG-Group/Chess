@@ -69,7 +69,7 @@ class MainComponent extends React.Component {
       ) {
         this.setState({ selected: game.board[y][x] });
       }else{
-        alert("Invalid Move!");
+        game.board[y][x] && alert("Invalid Move!");
       }
     }
   }
