@@ -9,8 +9,6 @@ import infl             from 'inflection';
 import Game             from './game';
 import { PIECE_CHARS }  from './pieces';
 
-//alert(infl.capitalize(infl.pluralize('knife')));
-
 window.game = new Game();
 // Pawns:
 for (var i = 0; i < 8; i++) {
@@ -44,12 +42,14 @@ class MainComponent extends React.Component {
 
     _.bindAll(this,
       '__handlePromotion',
-      '__handleGamePromotion'
+      '__handleGamePromotion',
+      '__handleCheckmate'
     );
 
     this.state = {
       selected: null,
       promotionParams: null,
+      checkmate: null,
       welcomeDialog: true,
       rotated: false
     };
@@ -58,7 +58,7 @@ class MainComponent extends React.Component {
   __handleClick (x, y) {
     var selected = this.state.selected;
     if (this.state.selected) {
-      game.moveSelected(this.state.selected, {x: x, y: y}, this.__handlePromotion);
+      game.moveSelected(this.state.selected, {x: x, y: y}, this.__handlePromotion, this.__handleCheckmate);
       this.setState({selected: null })
     }else{
       var last = game.turn.length - 1;
@@ -83,6 +83,10 @@ class MainComponent extends React.Component {
         pawn: pawn
       }
     });
+  }
+
+  __handleCheckmate(color){
+    this.setState({ checkmate: color });
   }
 
   __handleGamePromotion (piece) {
@@ -147,6 +151,7 @@ class MainComponent extends React.Component {
         </table>
 
         { this.state.promotionParams && this.__renderPromotionDialog() }
+        { this.state.checkmate && this.__renderCheckmateDialog() }
         { this.__renderWelcomeDialog() }
       </div>
     );
@@ -210,6 +215,27 @@ class MainComponent extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.__handleGamePromotion.bind(this, false)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  __renderCheckmateDialog () {
+    return (
+      <Modal
+        show={!!this.state.checkmate}
+        onHide={ () => {
+          this.setState({checkmate: null})
+        }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Checkmate!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          The { this.state.checkmate === 'W' ? 'black' : 'white' } player won!
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => { this.setState({checkmate: null}) }}>Close</Button>
         </Modal.Footer>
       </Modal>
     );
