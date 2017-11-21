@@ -9,32 +9,36 @@ import infl             from 'inflection';
 import Game             from './game';
 import { PIECE_CHARS }  from './pieces';
 
-window.game = new Game();
-// Pawns:
-for (var i = 0; i < 8; i++) {
-  game.piece('pawn', i, 6, 'W');
-  game.piece('pawn', i, 1, 'B');
+const initializeGame = () => {
+  window.game = new Game();
+  // Pawns:
+  for (var i = 0; i < 8; i++) {
+    game.piece('pawn', i, 6, 'W');
+    game.piece('pawn', i, 1, 'B');
+  }
+  
+  // Black figs:
+  game.piece('rook', 0, 0, 'B');
+  game.piece('knight', 1, 0, 'B');
+  game.piece('bishop', 2, 0, 'B');
+  game.piece('queen', 3, 0, 'B');
+  game.piece('king', 4, 0, 'B');
+  game.piece('bishop', 5, 0, 'B');
+  game.piece('knight', 6, 0, 'B');
+  game.piece('rook', 7, 0, 'B');
+  
+  // White figs:
+  game.piece('rook', 0, 7, 'W');
+  game.piece('knight', 1, 7, 'W');
+  game.piece('bishop', 2, 7, 'W');
+  game.piece('queen', 3, 7, 'W');
+  game.piece('king', 4, 7, 'W');
+  game.piece('bishop', 5, 7, 'W');
+  game.piece('knight', 6, 7, 'W');
+  game.piece('rook', 7, 7, 'W');
 }
 
-// Black figs:
-game.piece('rook', 0, 0, 'B');
-game.piece('knight', 1, 0, 'B');
-game.piece('bishop', 2, 0, 'B');
-game.piece('queen', 3, 0, 'B');
-game.piece('king', 4, 0, 'B');
-game.piece('bishop', 5, 0, 'B');
-game.piece('knight', 6, 0, 'B');
-game.piece('rook', 7, 0, 'B');
-
-// White figs:
-game.piece('rook', 0, 7, 'W');
-game.piece('knight', 1, 7, 'W');
-game.piece('bishop', 2, 7, 'W');
-game.piece('queen', 3, 7, 'W');
-game.piece('king', 4, 7, 'W');
-game.piece('bishop', 5, 7, 'W');
-game.piece('knight', 6, 7, 'W');
-game.piece('rook', 7, 7, 'W');
+initializeGame();
 
 class MainComponent extends React.Component {
   constructor () {
@@ -53,6 +57,11 @@ class MainComponent extends React.Component {
       welcomeDialog: true,
       rotated: false
     };
+  }
+
+  __handleReplay() {
+    this.setState({ checkmate: null });
+    initializeGame();
   }
 
   __handleClick (x, y) {
@@ -224,9 +233,7 @@ class MainComponent extends React.Component {
     return (
       <Modal
         show={!!this.state.checkmate}
-        onHide={ () => {
-          this.setState({checkmate: null})
-        }}
+        onHide={this.__handleReplay.bind(this)}
       >
         <Modal.Header closeButton>
           <Modal.Title>Checkmate!</Modal.Title>
@@ -235,7 +242,7 @@ class MainComponent extends React.Component {
           The { this.state.checkmate === 'W' ? 'black' : 'white' } player won!
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => { this.setState({checkmate: null}) }}>Close</Button>
+          <Button onClick={this.__handleReplay.bind(this)}>Replay</Button>
         </Modal.Footer>
       </Modal>
     );
