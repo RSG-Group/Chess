@@ -1,7 +1,7 @@
 import React            from 'react';
 import ReactDOM         from 'react-dom';
 import {
-  Modal, Button
+  Modal, Button, Glyphicon
 }                       from 'react-bootstrap';
 import _                from 'lodash';
 import classNames       from 'classnames';
@@ -47,7 +47,8 @@ class MainComponent extends React.Component {
     _.bindAll(this,
       '__handlePromotion',
       '__handleGamePromotion',
-      '__handleCheckmate'
+      '__handleCheckmate',
+      '__handleReplay'
     );
 
     this.state = {
@@ -55,12 +56,19 @@ class MainComponent extends React.Component {
       promotionParams: null,
       checkmate: null,
       welcomeDialog: true,
+      settingsDialog: false,
       rotated: false
     };
   }
 
   __handleReplay() {
-    this.setState({ checkmate: null });
+    this.setState({
+      selected: null,
+      promotionParams: null,
+      checkmate: null,
+      settingsDialog: false,
+      rotated: false
+    });
     initializeGame();
   }
 
@@ -132,6 +140,13 @@ class MainComponent extends React.Component {
   render() {
     return (
       <div>
+        <span
+          className="menu-icon"
+          onClick={() => { this.setState({ settingsDialog: true }) }}
+        >
+          <Glyphicon glyph="cog" />
+        </span>
+
         <table id={"table"} >
           <tbody>
             {this.__renderTable()}
@@ -160,6 +175,7 @@ class MainComponent extends React.Component {
         </table>
 
         { this.state.promotionParams && this.__renderPromotionDialog() }
+        { this.state.settingsDialog && this.__renderSettings() }
         { this.state.checkmate && this.__renderCheckmateDialog() }
         { this.__renderWelcomeDialog() }
       </div>
@@ -224,6 +240,51 @@ class MainComponent extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.__handleGamePromotion.bind(this, false)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  __renderSettings () {
+    const { settingsDialog } = this.state;
+
+    return (
+      <Modal
+        show={settingsDialog}
+        onHide={() => { this.setState({ settingsDialog: false }) }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Settings</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ul>
+            <li>
+              <Button
+                bsSize="small"
+                onClick={() => { this.setState({ rotated: !this.state.rotated }) }}
+              >
+                Rotate the black figures (or restore the rotation)
+              </Button> for real board experience.
+            </li>
+            <li>
+              <Button
+                bsSize="small"
+                style={{ marginTop: '3px' }}
+                onClick={this.__handleReplay}
+              >Replay</Button>
+            </li>
+            <li>
+              <a href="https://github.com/RSG-Group/Chess/blob/master/LICENSE" target="_blank">License</a>{`, `}
+              <a href="https://github.com/RSG-Group/Chess" target="_blank">Source code</a>;
+            </li>
+            <li>
+              <a href="https://github.com/RSG-Group/Chess/issues" target="_blank">Report a problem</a>{` `}
+              or contact us on <i>rsg.group.here@gmail.com</i>
+            </li>
+          </ul>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => { this.setState({ settingsDialog: false }) }}>Close</Button>
         </Modal.Footer>
       </Modal>
     );

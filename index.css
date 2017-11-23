@@ -15,6 +15,16 @@ div#app{
   transform: rotateX(180deg);
 }
 
+.menu-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  
+  margin: 3px;
+  font-size: 21px;
+  cursor: pointer;
+}
+
 div#app > div {
  /* transition: transform 1s;
  transform: rotateX(15deg) rotateY(-15deg) rotateX(3deg);
