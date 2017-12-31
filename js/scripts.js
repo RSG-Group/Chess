@@ -1,3 +1,7 @@
+//
+// RSG Chess
+// Licensed under Apache 2.0 LICENSE
+
 import React            from 'react';
 import ReactDOM         from 'react-dom';
 import {
@@ -10,14 +14,17 @@ import Game             from './game';
 import { PIECE_CHARS }  from './pieces';
 
 const initializeGame = () => {
+  // Game is set globally by window.game, because we want
+  // our algorithms to be fully accessible from your browser /DevTools/
   window.game = new Game();
-  // Pawns:
+
+  // Initialize the pawns:
   for (var i = 0; i < 8; i++) {
     game.piece('pawn', i, 6, 'W');
     game.piece('pawn', i, 1, 'B');
   }
   
-  // Black figs:
+  // Initialize the black figs:
   game.piece('rook', 0, 0, 'B');
   game.piece('knight', 1, 0, 'B');
   game.piece('bishop', 2, 0, 'B');
@@ -27,7 +34,7 @@ const initializeGame = () => {
   game.piece('knight', 6, 0, 'B');
   game.piece('rook', 7, 0, 'B');
   
-  // White figs:
+  // Initialize the white figs:
   game.piece('rook', 0, 7, 'W');
   game.piece('knight', 1, 7, 'W');
   game.piece('bishop', 2, 7, 'W');
@@ -43,7 +50,7 @@ initializeGame();
 class MainComponent extends React.Component {
   constructor () {
     super();
-
+    // bind the handle functions
     _.bindAll(this,
       '__handlePromotion',
       '__handleGamePromotion',
@@ -57,25 +64,32 @@ class MainComponent extends React.Component {
       checkmate: null,
       welcomeDialog: true,
       settingsDialog: false,
+      playAgainstAI: false,
       rotated: false
     };
   }
 
   __handleReplay() {
+    // Set state to null and false, to reset all params
     this.setState({
       selected: null,
       promotionParams: null,
+      welcomeDialog: true,
       checkmate: null,
       settingsDialog: false,
+      playAgainstAI: false,
       rotated: false
     });
+    // Initialize new game
     initializeGame();
   }
 
   __handleClick (x, y) {
     var selected = this.state.selected;
     if (this.state.selected) {
-      game.moveSelected(this.state.selected, {x: x, y: y}, this.__handlePromotion, this.__handleCheckmate);
+      game.moveSelected(
+        this.state.selected, {x: x, y: y}, this.__handlePromotion, this.__handleCheckmate, this.state.playAgainstAI
+      );
       this.setState({selected: null })
     }else{
       var last = game.turn.length - 1;
@@ -192,24 +206,25 @@ class MainComponent extends React.Component {
           <Modal.Title>Welcome</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Welcome to RSG Chess! <br />
-          Cool chess game for everyone. Challenge your friends and have fun!
-          <br /><br />
-          How to play?
+          Select play mode: <br />
+          Play VS computer{` `}
+          <Button bsSize='small' onClick={() => {
+            this.setState({ playAgainstAI: true, welcomeDialog: false })
+          }}>Easy {/*2*/}</Button>{` `}
+          <Button bsSize='small' disabled>Medium {/*3*/}</Button>{` `}
+          <Button bsSize='small' disabled>Hard {/*4*/}</Button>{` `}
+          <br/><br/>
+          or <Button
+            bsSize='small'
+            onClick={() => {
+              this.setState({ welcomeDialog: false })
+            }}
+          >start singleplayer</Button>
           <ul>
-            <li>
-              Singleplayer - Play with your opponent on YOUR device.
-              <ul>
-                <li>Like real chess board - Place your device horizontally on the surface,
-                <b
-                  style={{cursor: 'pointer'}}
-                  onClick={() => { this.setState({rotated: true}) }}
-                > click here to rotate the black figures </b> 
-                and feel like playing on real chess board.</li>
-              </ul>
-            </li>
-            <li>Multiplayer - Coming soon...</li>
-            <li>Play VS computer - Coming in the next bigger release.</li>
+            <li>Place your device horizontally on the surface and {` `}
+            <b style={{cursor: 'pointer'}} onClick={() => { this.setState({rotated: !this.state.rotated}) }}>
+              click here to rotate {this.state.rotated && 'back'} the black figures for real board experience
+            </b></li>
           </ul>
         </Modal.Body>
         <Modal.Footer>
@@ -217,7 +232,7 @@ class MainComponent extends React.Component {
             onClick={() => {
               this.setState({ welcomeDialog: false })
             }}
-          >Let's start!</Button>
+          >Let's start singleplayer!</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -271,11 +286,11 @@ class MainComponent extends React.Component {
                 bsSize="small"
                 style={{ marginTop: '3px' }}
                 onClick={this.__handleReplay}
-              >Replay</Button>
+              >New game /Click to select mode/</Button>
             </li>
             <li>
               <a href="https://github.com/RSG-Group/Chess/blob/master/LICENSE" target="_blank">License</a>{`, `}
-              <a href="https://github.com/RSG-Group/Chess" target="_blank">Source code</a>;
+              <a href="https://github.com/RSG-Group/Chess" target="_blank">Source code</a>; <a href="https://en.wikipedia.org/wiki/Rules_of_chess" target="_blank">Learn Chess</a>
             </li>
             <li>
               <a href="https://github.com/RSG-Group/Chess/issues" target="_blank">Report a problem</a>{` `}

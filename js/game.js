@@ -1,10 +1,11 @@
-import { Piece } from './pieces.js';
+import { Piece }    from './pieces.js';
+import Chess_AI from './AI.js';
 
 function Game(promoCallback) {
   this.board = [];
   this.turn = [];
   for (var i = 0; i < 8; i++) {
-    const arrayIn = [];
+    var arrayIn = [];
     for (var j = 0; j < 8; j++) {
       arrayIn.push(null);
     }
@@ -17,7 +18,9 @@ Game.prototype.piece = function (type, x, y, color) {
   this.board[y][x] = piece;
 };
 
-Game.prototype.moveSelected = function (selected, to, promotionCallback, checkmateCallback, simulate) {
+Game.prototype.moveSelected = function (
+  selected, to, promotionCallback, checkmateCallback, playAgainstAI, simulate
+) {
   var x = to.x;
   var y = to.y;
 
@@ -72,11 +75,24 @@ Game.prototype.moveSelected = function (selected, to, promotionCallback, checkma
       this.board[y][x].x = x;
       this.board[y][x].y = y;
 
-      const checkmateColor = selected.color === 'W' ? 'B' : 'W';
-      const checkmateValue = this.checkmate(checkmateColor);
+      var checkmateColor = selected.color === 'W' ? 'B' : 'W';
+      var checkmateValue = this.checkmate(checkmateColor);
       if(checkmateValue) checkmateCallback(checkmateValue);
     }
     selected = null;
+    // Play AI
+    if (playAgainstAI) {
+      var bestMove = Chess_AI(this);
+      this.moveSelected(
+        this.board[bestMove.from.y][bestMove.from.x],
+        bestMove.to,
+        promotionCallback,
+        checkmateCallback,
+        false,
+        simulate
+      )
+    }
+    // end
     return true;
   }
 };
