@@ -78,21 +78,22 @@ Game.prototype.moveSelected = function (
       var checkmateColor = selected.color === 'W' ? 'B' : 'W';
       var checkmateValue = this.checkmate(checkmateColor);
       if(checkmateValue) checkmateCallback(checkmateValue);
+      
+      // Play AI
+      if (playAgainstAI) {
+        var bestMove = Chess_AI(this);
+        this.moveSelected(
+          this.board[bestMove.from.y][bestMove.from.x],
+          bestMove.to,
+          promotionCallback,
+          checkmateCallback,
+          false,
+          simulate
+        )
+      }
+      // end
     }
     selected = null;
-    // Play AI
-    if (playAgainstAI) {
-      var bestMove = Chess_AI(this);
-      this.moveSelected(
-        this.board[bestMove.from.y][bestMove.from.x],
-        bestMove.to,
-        promotionCallback,
-        checkmateCallback,
-        false,
-        simulate
-      )
-    }
-    // end
     return true;
   }
 };
