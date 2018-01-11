@@ -39,13 +39,7 @@ Game.prototype.moveSelected = function (
       }
 
       if (!validMove) return false;
-
-      if (selected.type === "pawn" && y !== selected.y) {
-        if ((selected.color === "W" && y === 0) || (selected.color === "B" && y === 7)) {
-          if(promotionCallback) promotionCallback(selected, x, y, selected.color);
-        }
-      };
-
+      
       var movePiece = validMove.movePiece;
       var take, paste, rook;
       if (movePiece) {
@@ -61,7 +55,7 @@ Game.prototype.moveSelected = function (
           this.board[take.y][take.x] = null;
         }
       }
-
+      
       var piece = this.board[y][x] ? this.board[y][x] : null;
       var movePiece = (movePiece ? validMove.movePiece : null);
       this.turn.push({
@@ -69,12 +63,22 @@ Game.prototype.moveSelected = function (
         color: selected.color, type: selected.type,
         piece: piece, movePiece: movePiece
       });
-
+      
       this.board[y][x] = selected;
       this.board[selected.y][selected.x] = null;
       this.board[y][x].x = x;
       this.board[y][x].y = y;
-
+      
+      if (selected.type === "pawn") {
+        if ((selected.color === "W" && y === 0) || (selected.color === "B" && y === 7)) {
+          if(promotionCallback) {
+            !playAgainstAI && selected.color === "B" ?
+              this.promotePawn(selected, x, y, selected.color, "queen"):
+              promotionCallback(selected, x, y, selected.color);
+          }
+        }
+      };
+      
       var checkmateColor = selected.color === 'W' ? 'B' : 'W';
       var checkmateValue = this.checkmate(checkmateColor);
       if(checkmateValue) checkmateCallback(checkmateValue);
