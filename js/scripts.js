@@ -42,6 +42,10 @@ const initializeGame = () => {
   game.piece('bishop', 5, 7, 'W');
   game.piece('knight', 6, 7, 'W');
   game.piece('rook', 7, 7, 'W');
+
+  // load the initial FEN
+  game.FEN = game.gameToFEN();
+  game.FENhistory.push(game.FEN);
 }
 
 initializeGame();
