@@ -16,9 +16,9 @@ function Game(promoCallback) {
   // the history of all turns
   this.turn = [];
   // the current game configuration as FEN
-  this.FEN = this.gameToFEN();
+  this.FENboard = this.boardToFEN();
   // the history of all game configurations displayed using FEN
-  this.FENhistory = [];
+  this.threefold = [];
 }
 
 Game.prototype.piece = function (type, x, y, color) {
@@ -76,7 +76,12 @@ Game.prototype.moveSelected = function (
       this.board[selected.y][selected.x] = null;
       this.board[y][x].x = x;
       this.board[y][x].y = y;
-      
+
+      this.FENboard = this.boardToFEN();
+      this.threefold.push(this.FENboard);
+      if (selected.type === 'pawn' || piece) this.threefold = [];
+      if(this.threefoldCheck()) checkmateCallback('D');
+
       if (selected.type === "pawn") {
         if ((selected.color === "W" && y === 0) || (selected.color === "B" && y === 7)) {
           if(promotionCallback) {
@@ -90,9 +95,6 @@ Game.prototype.moveSelected = function (
       var checkmateColor = selected.color === 'W' ? 'B' : 'W';
       var checkmateValue = this.checkmate(checkmateColor);
       if(checkmateValue) checkmateCallback(checkmateValue);
-      
-      this.FEN = this.gameToFEN();
-      this.FENhistory.push(this.FEN);
 
       // Play AI
       if (playAgainstAI) {
@@ -196,15 +198,24 @@ Game.prototype.warning = function (color) {
   return result;
 };
 
-Game.prototype.pieceToAN = function(x, y) {
-  var xChars = 'abcdefgh';
-  return xChars.charAt(x) + (8 - y);
+Game.prototype.threefoldCheck = function () {
+  var threefold = this.threefold;
+  var length = threefold.length;
+
+  for(var i = 0; i < length; i++){
+    // using let will allow us to make the code simpler
+    let count = 0;
+    for (var j = i + 1; j < length; j++) {
+      if(threefold[i] === threefold[j]) count += 1;
+    }
+    if(count >= 2) return true;
+  }
+  
+  return false;
 }
 
-Game.prototype.gameToFEN = function () {
+Game.prototype.boardToFEN = function () {
   var board = this.board;
-  var turn = this.turn;
-  var FEN = '';
  
   // Convert the board configuration into FEN
   var FENboard = '';
@@ -224,68 +235,13 @@ Game.prototype.gameToFEN = function () {
     FENboard += i < 7 ? '/' : '';
   }
  
-  FEN += FENboard;
- 
-  // Find the active colour
-  var activeColor =
-    turn.length &&
-    turn[turn.length - 1].color === 'W' ? 'b' : 'w';
- 
-  FEN += ' ' + activeColor;
- 
-  // Check castling availability
-  var possibleCastling = '';
- 
-  var whiteKingMoved;
-  var blackKingMoved;
-  turn.some(function (turn) {
-    whiteKingMoved = turn.type === 'king' && turn.color === 'W';
-    blackKingMoved = turn.type === 'king' && turn.color === 'B';
-  });
- 
-  [[7, 0], [0, 0], [7, 7], [0, 7]].forEach(function (props) {
-    var rookX = props[0];
-    var rookY = props[1];
-    var rook = board[rookY][rookX];
- 
-    // Check rook on position
-    if (!rook || !rook.type === 'rook') return;
-    // Check rook hasn't moved
-    if (turn.some(function (ev) {
-      return ev.from.x === rookX && ev.from.y === rookY;
-    })) return;
- 
-    var castlingSide = rookX === 0 ? 'q' : 'k';
-    possibleCastling += rookY === 0 ? castlingSide.toUpperCase() : castlingSide;
-  });
- 
-  if (!possibleCastling) possibleCastling = '-';
-  FEN += ' ' + possibleCastling;
- 
-  // Check the En-passant target
-  var enPassantTarget = '';
-
-  if (turn.length) {
-    var ev = turn[turn.length - 1];
-    if (ev.color === 'W' && ev.to.y === 4){
-      enPassantTarget = this.pieceToAN(ev.to.x, ev.to.y + 1)
-    }
-    
-    if (ev.color === 'B' && ev.to.y === 3){
-      enPassantTarget = this.pieceToAN(ev.to.x, ev.to.y - 1)
-    }
-  }
-
-  if (!enPassantTarget) enPassantTarget = '-';
-  FEN += ' ' + enPassantTarget;
-
   /*
     More information about the FEN notation:
     https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
     https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation
   */
  
-  return FEN;
+  return FENboard;
 };
 
 export default Game;

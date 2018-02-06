@@ -42,10 +42,6 @@ const initializeGame = () => {
   game.piece('bishop', 5, 7, 'W');
   game.piece('knight', 6, 7, 'W');
   game.piece('rook', 7, 7, 'W');
-
-  // load the initial FEN
-  game.FEN = game.gameToFEN();
-  game.FENhistory.push(game.FEN);
 }
 
 initializeGame();
@@ -312,11 +308,8 @@ class MainComponent extends React.Component {
     const { checkmate } = this.state;
 
     return (
-      <Modal
-        show={!!checkmate}
-        onHide={() => { this.setState({ checkmate: false }) }}
-      >
-        <Modal.Header closeButton>
+      <Modal show={!!checkmate}>
+        <Modal.Header>
           <Modal.Title>{ checkmate === 'D' ? 'Stalemate!' : 'Checkmate!' }</Modal.Title>
         </Modal.Header>
         <Modal.Body>
