@@ -77,11 +77,16 @@ Game.prototype.moveSelected = function (
       this.board[y][x].x = x;
       this.board[y][x].y = y;
 
+      // check for threefold repetition
       this.FENboard = this.boardToFEN();
       this.threefold.push(this.FENboard);
       if (selected.type === 'pawn' || piece) this.threefold = [];
       if(this.threefoldCheck()) checkmateCallback('D');
 
+      // check for the fifty-move rule
+      if (this.halfmoveClock() >= 50) checkmateCallback('D');
+
+      // check for pawn promotion
       if (selected.type === "pawn") {
         if ((selected.color === "W" && y === 0) || (selected.color === "B" && y === 7)) {
           if(promotionCallback) {
@@ -150,6 +155,7 @@ Game.prototype.simulateAndFilter = function (moves, piece) {
 }
 
 Game.prototype.checkmate = function(color){
+  // using let will allow us to make the code a bit simpler
   for(let i = 0; i < 8; i++){
 		for(let j = 0; j < 8; j++){
 			if (
@@ -243,5 +249,20 @@ Game.prototype.boardToFEN = function () {
  
   return FENboard;
 };
+
+Game.prototype.halfmoveClock = function () {
+  var turn = this.turn;
+  var length = turn.length;
+  var count = 0;
+  if (turn.length === 0) return count;
+
+  var ev = turn[(length - 1) - count];
+  while(count <= length - 1 && ev.type !== 'pawn' && !ev.piece){
+    count++;
+    ev = turn[(length - 1) - count]; 
+  }
+
+  return count;
+}
 
 export default Game;
