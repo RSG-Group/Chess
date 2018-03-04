@@ -2,60 +2,61 @@
 // RSG Chess
 // Licensed under Apache 2.0 LICENSE
 
-import React            from 'react';
-import ReactDOM         from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import {
   Modal, Button, Glyphicon
-}                       from 'react-bootstrap';
-import _                from 'lodash';
-import classNames       from 'classnames';
-import Game             from './game';
-import { PIECE_CHARS }  from './pieces';
+} from 'react-bootstrap'
+import _ from 'lodash'
+import classNames from 'classnames'
+import Game from './game'
+import { PIECE_CHARS } from './pieces'
 
+let game
 const initializeGame = () => {
   // Game is set globally by window.game, because we want
   // our algorithms to be fully accessible from your browser /DevTools/
-  window.game = new Game();
+  game = new Game()
 
   // Initialize the pawns:
   for (var i = 0; i < 8; i++) {
-    game.piece('pawn', i, 6, 'W');
-    game.piece('pawn', i, 1, 'B');
+    game.piece('pawn', i, 6, 'W')
+    game.piece('pawn', i, 1, 'B')
   }
-  
+
   // Initialize the black figs:
-  game.piece('rook', 0, 0, 'B');
-  game.piece('knight', 1, 0, 'B');
-  game.piece('bishop', 2, 0, 'B');
-  game.piece('queen', 3, 0, 'B');
-  game.piece('king', 4, 0, 'B');
-  game.piece('bishop', 5, 0, 'B');
-  game.piece('knight', 6, 0, 'B');
-  game.piece('rook', 7, 0, 'B');
-  
+  game.piece('rook', 0, 0, 'B')
+  game.piece('knight', 1, 0, 'B')
+  game.piece('bishop', 2, 0, 'B')
+  game.piece('queen', 3, 0, 'B')
+  game.piece('king', 4, 0, 'B')
+  game.piece('bishop', 5, 0, 'B')
+  game.piece('knight', 6, 0, 'B')
+  game.piece('rook', 7, 0, 'B')
+
   // Initialize the white figs:
-  game.piece('rook', 0, 7, 'W');
-  game.piece('knight', 1, 7, 'W');
-  game.piece('bishop', 2, 7, 'W');
-  game.piece('queen', 3, 7, 'W');
-  game.piece('king', 4, 7, 'W');
-  game.piece('bishop', 5, 7, 'W');
-  game.piece('knight', 6, 7, 'W');
-  game.piece('rook', 7, 7, 'W');
+  game.piece('rook', 0, 7, 'W')
+  game.piece('knight', 1, 7, 'W')
+  game.piece('bishop', 2, 7, 'W')
+  game.piece('queen', 3, 7, 'W')
+  game.piece('king', 4, 7, 'W')
+  game.piece('bishop', 5, 7, 'W')
+  game.piece('knight', 6, 7, 'W')
+  game.piece('rook', 7, 7, 'W')
 }
 
-initializeGame();
+initializeGame()
 
 class MainComponent extends React.Component {
   constructor () {
-    super();
+    super()
     // bind the handle functions
     _.bindAll(this,
       '__handlePromotion',
       '__handleGamePromotion',
       '__handleCheckmate',
       '__handleReplay'
-    );
+    )
 
     this.state = {
       selected: null,
@@ -65,10 +66,10 @@ class MainComponent extends React.Component {
       settingsDialog: false,
       playAgainstAI: false,
       rotated: false
-    };
+    }
   }
 
-  __handleReplay() {
+  __handleReplay () {
     // Set state to null and false, to reset all params
     this.setState({
       selected: null,
@@ -78,28 +79,28 @@ class MainComponent extends React.Component {
       settingsDialog: false,
       playAgainstAI: false,
       rotated: false
-    });
+    })
     // Initialize new game
-    initializeGame();
+    initializeGame()
   }
 
   __handleClick (x, y) {
-    var selected = this.state.selected;
-    if (this.state.selected) {
+    var selected = this.state.selected
+    if (selected) {
       game.moveSelected(
-        this.state.selected, {x: x, y: y}, this.__handlePromotion, this.__handleCheckmate, this.state.playAgainstAI
-      );
-      this.setState({selected: null })
-    }else{
-      var last = game.turn.length - 1;
+        selected, {x: x, y: y}, this.__handlePromotion, this.__handleCheckmate, this.state.playAgainstAI
+      )
+      this.setState({ selected: null })
+    } else {
+      var last = game.turn.length - 1
       if (
-        game.board[y][x] && 
-        (last >= 0 ? game.board[y][x].color !== game.turn[last].color :
-        game.board[y][x].color === "W")
+        game.board[y][x] &&
+        (last >= 0 ? game.board[y][x].color !== game.turn[last].color
+          : game.board[y][x].color === 'W')
       ) {
-        this.setState({ selected: game.board[y][x] });
-      }else{
-        game.board[y][x] && alert("Invalid Move!");
+        this.setState({ selected: game.board[y][x] })
+      } else {
+        game.board[y][x] && alert('Invalid Move!')
       }
     }
   }
@@ -112,24 +113,24 @@ class MainComponent extends React.Component {
         color: color,
         pawn: pawn
       }
-    });
+    })
   }
 
-  __handleCheckmate(color){
-    this.setState({ checkmate: color });
+  __handleCheckmate (color) {
+    this.setState({ checkmate: color })
   }
 
   __handleGamePromotion (piece) {
-    if (piece){
-      const { x, y, color, pawn } = this.state.promotionParams;
-      game.promotePawn(pawn, x, y, color, piece);
+    if (piece) {
+      const { x, y, color, pawn } = this.state.promotionParams
+      game.promotePawn(pawn, x, y, color, piece)
     }
-    this.setState({ promotionParams: null });
+    this.setState({ promotionParams: null })
   }
 
   __renderTable () {
-    const { selected, rotated } = this.state;
-    const validMoves = selected && selected.getValidMoves(true);
+    const { selected, rotated } = this.state
+    const validMoves = selected && selected.getValidMoves(true)
     return game.board.map((rank, i) => (
       <tr key={i}>
         {
@@ -143,14 +144,14 @@ class MainComponent extends React.Component {
               })}
             >
               {piece && piece.char}
-            </td>            
+            </td>
           ))
         }
       </tr>
-    ));
+    ))
   }
 
-  render() {
+  render () {
     return (
       <div>
         <span
@@ -160,7 +161,7 @@ class MainComponent extends React.Component {
           <Glyphicon glyph="cog" />
         </span>
 
-        <table id={"table"} >
+        <table id={'table'} >
           <tbody>
             {this.__renderTable()}
           </tbody>
@@ -192,7 +193,7 @@ class MainComponent extends React.Component {
         { this.state.checkmate && this.__renderCheckmateDialog() }
         { this.__renderWelcomeDialog() }
       </div>
-    );
+    )
   }
 
   __renderWelcomeDialog () {
@@ -209,9 +210,9 @@ class MainComponent extends React.Component {
           Play VS computer{` `}
           <Button bsSize='small' onClick={() => {
             this.setState({ playAgainstAI: true, welcomeDialog: false })
-          }}>Easy {/*2*/}</Button>{` `}
-          <Button bsSize='small' disabled>Medium {/*3*/}</Button>{` `}
-          <Button bsSize='small' disabled>Hard {/*4*/}</Button>{` `}
+          }}>Easy {/* 2 */}</Button>{` `}
+          <Button bsSize='small' disabled>Medium {/* 3 */}</Button>{` `}
+          <Button bsSize='small' disabled>Hard {/* 4 */}</Button>{` `}
           <br/><br/>
           or <Button
             bsSize='small'
@@ -221,9 +222,9 @@ class MainComponent extends React.Component {
           >start singleplayer</Button>
           <ul>
             <li>Place your device horizontally on the surface and {` `}
-            <b style={{cursor: 'pointer'}} onClick={() => { this.setState({rotated: !this.state.rotated}) }}>
+              <b style={{cursor: 'pointer'}} onClick={() => { this.setState({rotated: !this.state.rotated}) }}>
               click here to rotate {this.state.rotated && 'back'} the black figures for real board experience
-            </b></li>
+              </b></li>
           </ul>
         </Modal.Body>
         <Modal.Footer>
@@ -234,7 +235,7 @@ class MainComponent extends React.Component {
           >Let's start singleplayer!</Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 
   __renderPromotionDialog () {
@@ -256,11 +257,11 @@ class MainComponent extends React.Component {
           <Button onClick={this.__handleGamePromotion.bind(this, false)}>Close</Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 
   __renderSettings () {
-    const { settingsDialog } = this.state;
+    const { settingsDialog } = this.state
 
     return (
       <Modal
@@ -301,11 +302,11 @@ class MainComponent extends React.Component {
           <Button onClick={() => { this.setState({ settingsDialog: false }) }}>Close</Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 
   __renderCheckmateDialog () {
-    const { checkmate } = this.state;
+    const { checkmate } = this.state
 
     return (
       <Modal show={!!checkmate}>
@@ -314,18 +315,18 @@ class MainComponent extends React.Component {
         </Modal.Header>
         <Modal.Body>
           {
-            checkmate !== 'D' ?
-            `The ${ checkmate === 'W' ? 'black' : 'white'}  player won!` :
-            'Draw!'
+            checkmate !== 'D'
+              ? `The ${checkmate === 'W' ? 'black' : 'white'}  player won!`
+              : 'Draw!'
           }
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.__handleReplay.bind(this)}>Replay</Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 }
 
-var app = document.getElementById('app');
-ReactDOM.render(<MainComponent />, app);
+var app = document.getElementById('app')
+ReactDOM.render(<MainComponent />, app)
