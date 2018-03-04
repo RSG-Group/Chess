@@ -2,49 +2,47 @@
 // RSG Chess
 // Licensed under Apache 2.0 LICENSE
 
-const ChessAI = function (game) {
-  var board = game.board
-  // best values /bestMove & bestValue/
-  var bestMove = null
+const ChessAI = function (depth, game, isMaximisingPlayer) {
+  var allMoves = game.allMoves()
   var bestValue = -9999
-  for (var i = 0; i < 8; i++) {
-    for (var j = 0; j < 8; j++) {
-      board[i][j] &&
-      board[i][j].getValidMoves()
-        .forEach(function (ev, k) {
-        // needed variables
-          var piece = board[i][j]
-          var from = { x: piece.x, y: piece.y }
-          var movePiece = board[ev.y][ev.x] ? {
-            piece: board[ev.y][ev.x],
-            from: { x: ev.x, y: ev.y },
-            to: null
-          } : null
-          // check for en-passant, and already captured pieces /movePiece/
-          if (ev.movePiece) movePiece = ev.movePiece
-          if (movePiece) game.simpleMovePiece(movePiece.piece, movePiece.from, movePiece.to)
-          // simulate the current move from .getValidMoves() array /ev/
-          game.simpleMovePiece(piece, from, { x: ev.x, y: ev.y })
-          // evulate the board and get the best move /boardValue > bestValue -> bestMove = {.../
-          var boardValue = -evaluateBoard(board)
-          if (
-            boardValue > bestValue &&
-            board[ev.y][ev.x].color === 'B'
-          ) {
-            bestValue = boardValue
-            bestMove = {
-              from: {x: j, y: i},
-              to: ev
-            }
-          }
-          // return the current move /ev/
-          game.simpleMovePiece(piece, { x: ev.x, y: ev.y }, from)
-          if (movePiece) game.simpleMovePiece(movePiece.piece, movePiece.to, movePiece.from)
-        })
+  var bestMove
+
+  for (var i = 0; i < allMoves.length; i++) {
+    var newGameMove = allMoves[i]
+    var undo = game.simpleMove(newGameMove)
+    var boradValue = minimax(depth - 1, game, !isMaximisingPlayer)
+    undo()
+    if (boradValue >= bestValue) {
+      bestValue = boradValue
+      bestMove = newGameMove
     }
   }
-  // return the best move
   return bestMove
+}
+
+var minimax = function (depth, game, isMaximisingPlayer) {
+  if (depth === 0) {
+    return -evaluateBoard(game.board)
+  }
+
+  var allMoves = game.allMoves()
+  if (isMaximisingPlayer) {
+    let bestValue = -9999
+    for (let i = 0; i < allMoves.length; i++) {
+      let undo = game.simpleMove(allMoves[i])
+      bestValue = Math.max(bestValue, minimax(depth - 1, game, !isMaximisingPlayer))
+      undo()
+    }
+    return bestValue
+  } else {
+    let bestValue = 9999
+    for (let i = 0; i < allMoves.length; i++) {
+      let undo = game.simpleMove(allMoves[i])
+      bestValue = Math.min(bestValue, minimax(depth - 1, game, !isMaximisingPlayer))
+      undo()
+    }
+    return bestValue
+  }
 }
 
 var evaluateBoard = function (board) {

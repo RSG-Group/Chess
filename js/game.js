@@ -106,7 +106,7 @@ Game.prototype.moveSelected = function (
 
       // Play AI
       if (playAgainstAI) {
-        var bestMove = ChessAI(this)
+        var bestMove = ChessAI(playAgainstAI.depth, this, true)
         this.moveSelected(
           this.board[bestMove.from.y][bestMove.from.x],
           bestMove.to,
@@ -184,6 +184,29 @@ Game.prototype.simpleMovePiece = function (piece, from, to) {
     piece.y = to.y
   }
   if (from) board[from.y][from.x] = null
+}
+
+Game.prototype.simpleMove = function (move) {
+  var self = this
+  var board = self.board
+  var from = move.from
+  var to = move.to
+  var piece = board[from.y][from.x]
+  var movePiece = board[to.y][to.x] ? {
+    piece: board[to.y][to.x],
+    from: { x: to.x, y: to.y },
+    to: null
+  } : null
+
+  if (to.movePiece) movePiece = to.movePiece
+  if (movePiece) self.simpleMovePiece(movePiece.piece, movePiece.from, movePiece.to)
+  self.simpleMovePiece(piece, from, { x: to.x, y: to.y })
+
+  return function () {
+    // return the current move /ev/
+    self.simpleMovePiece(piece, { x: to.x, y: to.y }, from)
+    if (movePiece) self.simpleMovePiece(movePiece.piece, movePiece.to, movePiece.from)
+  }
 }
 
 Game.prototype.warning = function (color) {
@@ -269,6 +292,31 @@ Game.prototype.halfmoveClock = function () {
   }
 
   return count
+}
+
+Game.prototype.allMoves = function () {
+  var board = this.board
+  var turn = this.turn
+  var allMoves = []
+  var activeColour = turn.length && turn[turn.length - 1].color === 'W' ? 'B' : 'W'
+
+  for (var i = 0; i < 8; i++) {
+    for (var j = 0; j < 8; j++) {
+      if (board[i][j] && board[i][j].color === activeColour) {
+        var validMoves = board[i][j].getValidMoves()
+        validMoves.forEach(function (ev) {
+          allMoves.push({
+            color: board[i][j].color,
+            from: {x: j, y: i},
+            to: ev,
+            FENname: board[i][j].FENname
+          })
+        })
+      }
+    }
+  }
+
+  return allMoves
 }
 
 export default Game

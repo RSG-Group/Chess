@@ -209,10 +209,12 @@ class MainComponent extends React.Component {
           Select play mode: <br />
           Play VS computer{` `}
           <Button bsSize='small' onClick={() => {
-            this.setState({ playAgainstAI: true, welcomeDialog: false })
-          }}>Easy {/* 2 */}</Button>{` `}
-          <Button bsSize='small' disabled>Medium {/* 3 */}</Button>{` `}
-          <Button bsSize='small' disabled>Hard {/* 4 */}</Button>{` `}
+            this.setState({ playAgainstAI: { depth: 2 }, welcomeDialog: false })
+          }}>Easy</Button>{` `}
+          <Button bsSize='small' onClick={() => {
+            this.setState({ playAgainstAI: { depth: 4 }, welcomeDialog: false })
+          }}>Medium</Button>{` `}
+          <Button bsSize='small' disabled>Hard</Button>{` `}
           <br/><br/>
           or <Button
             bsSize='small'
