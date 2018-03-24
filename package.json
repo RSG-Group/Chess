@@ -1,14 +1,14 @@
 {
-  "name": "chess",
-  "version": "1.0.0",
-  "description": "The best chess game ... by RSG",
+  "name": "rsg-chess",
+  "version": "1.1.0-alpha.1",
+  "description": "Cool chess game for everyone.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint ./js/"
   },
-  "author": "RSG",
-  "license": "ISC",
+  "author": "/Radi Cho/ RSG",
+  "license": "Apache 2.0",
   "dependencies": {
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
